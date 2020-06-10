@@ -18,7 +18,7 @@ def getDataset():
                         with io.open(f"3000tweet/raw_texts/{di}/"+file, 'r', encoding='iso-8859-9') as f:
                             text = f.read()
                             sub_data.append(text)
-                            sub_data.append(str(di))
+                            sub_data.append(str(int(di)-1))
                         dataset.append(sub_data)
             random.shuffle(dataset)
         data = pd.DataFrame(dataset, columns=['Sentence', 'Sentiment'])
