@@ -12,28 +12,23 @@ class Tweet17K (IDataset):
     def getDataset(self):
         try:
             path = Path(__file__).parent / \
-                "../Data/tweet3k/dataset.csv"
+                "../Data/tweet17k/dataset.csv"
             dataset = pd.read_csv(path, encoding='iso-8859-9')
         except:
-            dataset = []
             path = Path(__file__).parent / \
-                "../Data/tweet3k/raw_texts"
-            for Root, Dirs, Files in os.walk(f"{path}"):
-                for di in Dirs:
-                    for root, dirs, files in os.walk(f"{path}/{di}"):
-                        for file in files:
-                            sub_data = []
-                            with io.open(f"{path}/{di}/"+file, 'r', encoding='iso-8859-9') as f:
-                                text = f.read()
-                                sub_data.append(text)
-                                sub_data.append(str(int(di)-1))
-                            dataset.append(sub_data)
-                random.shuffle(dataset)
+                "../Data/tweet17k"
+            train_tweets = self.readLineByLine(
+                pd.read_excel(f"{path}/train_tweets.xlsx"))
+            test_tweets = self.readLineByLine(
+                pd.read_excel(f"{path}/test_tweets.xlsx"))
+            dataset = train_tweets + test_tweets
+            random.shuffle(dataset)
+            random.shuffle(dataset)
             dataset = pd.DataFrame(dataset, columns=['Sentence', 'Sentiment'])
             dataset.dropna(inplace=True)
             path = Path(__file__).parent / \
-                "../Data/tweet3k/dataset.csv"
-            dataset.to_csv(path, index=False, encoding='iso-8859-9')
+                "../Data/tweet17k/dataset.csv"
+            dataset.to_csv(path, index=False)
             print("No csv file was found!, new file was created :)")
         dataset = dataset.sample(frac=1).reset_index(drop=True)
         return dataset
@@ -51,7 +46,16 @@ class Tweet17K (IDataset):
     def getFeatures(self):
         return self.getDataset().iloc[:, 0].values
 
+    def readLineByLine(self, data):
+        tweets = []
+        for row in range(data.shape[0]):
+            tweet = []
+            for col in range(data.shape[1]):
+                tweet.append(data.iat[row, col])
+            tweets.append(tweet)
+        return tweets
 
-# H = Tweet3K()
+
+# H = Tweet17K()
 # H.getDataset()
 # print(H.getDataset())

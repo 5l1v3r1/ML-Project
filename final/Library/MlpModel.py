@@ -5,6 +5,8 @@ from IDataset import IDataset
 from Hurriyet import Hurriyet
 from Aahaber import Aahaber
 from Tweet3K import Tweet3K
+from Tweet17K import Tweet17K
+from Milliyet import Milliyet
 from TurkishProcessor import TurkishProcessor
 from helpers import get_external_stopwords, find_max_length
 import tensorflow as tf
@@ -50,7 +52,6 @@ class MlpModel (IModel):
 
     def mlp_model(self, processed_features, labels):
         classes_num = self.dataset.getParameters()["classes_num"]
-
         X_train, X_test, y_train, y_test = train_test_split(
             processed_features, labels, test_size=self.TEST_SIZE, random_state=0)
         tokenizer = Tokenizer(num_words=self.NUM_WORDS)
@@ -85,7 +86,7 @@ class MlpModel (IModel):
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
 
-H = Aahaber(False, True)
+H = Milliyet(False, True)
 tp = TurkishProcessor(H)
 mm = MlpModel(tp, H)
 mm.evaluate()
