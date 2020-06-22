@@ -43,10 +43,10 @@ class Aahaber (IDataset):
         self.stemming = stemming
 
     def getClasses(self):
-        return self.getDataset().iloc[:1000, 1].values
+        return self.getDataset().iloc[:, 1].values
 
     def getFeatures(self):
-        return self.getDataset().iloc[:1000, 0].values
+        return self.getDataset().iloc[:, 0].values
 
 # H = Hurriyet()
 # H.getDataset()

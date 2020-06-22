@@ -102,7 +102,7 @@ class LstmModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Aahaber(False, True)
-tp = TurkishProcessor(H)
-mm = LstmModel(tp, H)
-mm.evaluate()
+# H = Aahaber(False, True)
+# tp = TurkishProcessor(H)
+# mm = LstmModel(tp, H)
+# mm.evaluate()

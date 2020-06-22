@@ -1,0 +1,20 @@
+{% extends "gui/base.html" %} {% block content%}
+<div>
+  <select class="custom-select custom-select-lg mb-3">
+    <option selected>Open this select menu</option>
+    {% for dataset in datasets %}
+    <option value="{{dataset}}">{{dataset}}</option>
+    {% endfor %}
+  </select>
+</div>
+<div>
+  <select class="custom-select custom-select-lg mb-3">
+    <option selected>Open this select menu</option>
+    {% for algorithm in algorithms %}
+    <option value="{{algorithm}}">{{algorithm}}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<a class="btn btn-primary" href="/evaluate">Evaluate</a>
+{%endblock content%}
