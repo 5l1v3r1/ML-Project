@@ -2,12 +2,16 @@ from IModel import IModel
 from IProcessor import IProcessor
 from IDataset import IDataset
 
+from MiniNews import MiniNews
+from EnglishProcessor import EnglishProcessor
+
 from Hurriyet import Hurriyet
 from Aahaber import Aahaber
 from Tweet3K import Tweet3K
 from Tweet17K import Tweet17K
 from Milliyet import Milliyet
 from TurkishProcessor import TurkishProcessor
+
 from helpers import get_external_stopwords, find_max_length
 import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -29,7 +33,7 @@ class MlpModel (IModel):
     BATCH_SIZE = 100
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
-    TEST_SIZE = 0.2
+    TEST_SIZE = 0.7
     NUM_WORDS = 1500
 
     def __init__(self, processor: IProcessor, dataset: IDataset):
@@ -89,7 +93,13 @@ class MlpModel (IModel):
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
 
-H = Tweet3K(False, True)
-tp = TurkishProcessor(H)
+# H = Milliyet(False, True)
+# tp = TurkishProcessor(H)
+# mm = MlpModel(tp, H)
+# mm.evaluate()
+
+
+H = MiniNews(False, True)
+tp = EnglishProcessor(H)
 mm = MlpModel(tp, H)
 mm.evaluate()

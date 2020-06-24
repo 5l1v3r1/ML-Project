@@ -1,7 +1,8 @@
 from IModel import IModel
 from IProcessor import IProcessor
 from IDataset import IDataset
-
+from MiniNews import MiniNews
+from EnglishProcessor import EnglishProcessor
 from Hurriyet import Hurriyet
 from Aahaber import Aahaber
 from Tweet3K import Tweet3K
@@ -31,7 +32,7 @@ class CnnModel (IModel):
     NUM_WORDS = 1500
     EMBEDING_DIM = 100
     EPOCHS = 100
-    BATCH_SIZE = 600
+    BATCH_SIZE = 200
     VOCAB_SIZE = 0
     INPUT_LENGTH = 0
 
@@ -106,7 +107,12 @@ class CnnModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Milliyet(False, True)
-tp = TurkishProcessor(H)
+# H = Milliyet(False, True)
+# tp = TurkishProcessor(H)
+# mm = CnnModel(tp, H)
+# mm.evaluate()
+
+H = MiniNews(False, True)
+tp = EnglishProcessor(H)
 mm = CnnModel(tp, H)
 mm.evaluate()

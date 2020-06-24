@@ -27,7 +27,7 @@ class RnnModel (IModel):
 
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
-    TEST_SIZE = 0.2
+    TEST_SIZE = 0.5
     NUM_WORDS = 2500
     EMBEDING_DIM = 64
     EPOCHS = 200
@@ -105,7 +105,7 @@ class RnnModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Milliyet(False, True)
+H = Aahaber(False, True)
 tp = TurkishProcessor(H)
 mm = RnnModel(tp, H)
 mm.evaluate()

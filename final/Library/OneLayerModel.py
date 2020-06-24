@@ -1,7 +1,8 @@
 from IModel import IModel
 from IProcessor import IProcessor
 from IDataset import IDataset
-
+from MiniNews import MiniNews
+from EnglishProcessor import EnglishProcessor
 from Hurriyet import Hurriyet
 from Aahaber import Aahaber
 from Tweet3K import Tweet3K
@@ -91,7 +92,13 @@ class OneLayerModel (IModel):
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
 
-H = Milliyet(False, True)
-tp = TurkishProcessor(H)
+# H = Milliyet(False, True)
+# tp = TurkishProcessor(H)
+# mm = OneLayerModel(tp, H)
+# mm.evaluate()
+
+
+H = MiniNews(False, True)
+tp = EnglishProcessor(H)
 mm = OneLayerModel(tp, H)
 mm.evaluate()

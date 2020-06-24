@@ -27,7 +27,7 @@ class LstmModel (IModel):
 
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
-    TEST_SIZE = 0.2
+    TEST_SIZE = 0.5
     NUM_WORDS = 2500
     EMBEDING_DIM = 100
     EPOCHS = 200
@@ -105,7 +105,7 @@ class LstmModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Milliyet(False, False)
+H = Hurriyet(False, False)
 tp = TurkishProcessor(H)
 mm = LstmModel(tp, H)
 mm.evaluate()

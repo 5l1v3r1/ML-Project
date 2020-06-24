@@ -32,7 +32,7 @@ class FastTextModel (IModel):
     BATCH_SIZE = 100
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
-    TEST_SIZE = 0.2
+    TEST_SIZE = 0.5
     NUM_WORDS = 900
 
     def __init__(self, processor: IProcessor, dataset: IDataset):
@@ -148,7 +148,7 @@ class FastTextModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Aahaber(False, True)
+H = Tweet17K(False, True)
 tp = TurkishProcessor(H)
 mm = FastTextModel(tp, H)
 mm.evaluate()
