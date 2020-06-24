@@ -29,10 +29,10 @@ class Aahaber (IDataset):
             path = Path(__file__).parent / \
                 "../Data/aahaber/dataset.csv"
             dataset = pd.DataFrame(dataset, columns=['Sentence', 'Category'])
-            dataset.dropna(inplace=True)
+            # dataset.dropna(inplace=True)
             dataset.to_csv(path, index=False, encoding='iso-8859-9')
             print("No csv file was found!, new file was created :)")
-        dataset = dataset.sample(frac=1).reset_index(drop=True)
+        #dataset = dataset.sample(frac=1).reset_index(drop=True)
         return dataset
 
     def getParameters(self):

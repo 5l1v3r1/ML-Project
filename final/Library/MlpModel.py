@@ -86,7 +86,7 @@ class MlpModel (IModel):
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
 
-H = Aahaber(False, True)
+H = Aahaber(False, False)
 tp = TurkishProcessor(H)
 mm = MlpModel(tp, H)
 mm.evaluate()

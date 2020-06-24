@@ -25,12 +25,12 @@ class Tweet17K (IDataset):
             random.shuffle(dataset)
             random.shuffle(dataset)
             dataset = pd.DataFrame(dataset, columns=['Sentence', 'Sentiment'])
-            dataset.dropna(inplace=True)
+            # dataset.dropna(inplace=True)
             path = Path(__file__).parent / \
                 "../Data/tweet17k/dataset.csv"
             dataset.to_csv(path, index=False)
             print("No csv file was found!, new file was created :)")
-        dataset = dataset.sample(frac=1).reset_index(drop=True)
+        # dataset = dataset.sample(frac=1).reset_index(drop=True)
         return dataset
 
     def getParameters(self):
