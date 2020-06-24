@@ -25,7 +25,7 @@ import pickle
 
 class MlpModel (IModel):
 
-    EPOCHS = 30
+    EPOCHS = 200
     BATCH_SIZE = 100
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
@@ -37,10 +37,13 @@ class MlpModel (IModel):
         self.dataset = dataset
 
     def evaluate(self):
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
 
-        features = self.processor.process()
-        #pickle.dump(features, open("bow.p", "wb"))
-        #features = pickle.load(open("bow.p", "rb"))
         labels = self.dataset.getClasses()
         le = preprocessing.LabelEncoder()
         labels = le.fit_transform(labels)
@@ -65,13 +68,13 @@ class MlpModel (IModel):
         model = Sequential()
         model.add(Embedding(vocab_size, 64, input_length=lenth))
         model.add(Flatten())
-        model.add(Dense(4, activation='relu'))
+        model.add(Dense(64, activation='relu'))
         model.add(Dropout(0.4))
         model.add(Dense(classes_num, activation=self.ACTIVATION))
         model.compile(loss=self.LOSSFUNC, optimizer='adam',
                       metrics=['accuracy'])
         es_callback = EarlyStopping(
-            monitor='val_loss', patience=3)
+            monitor='val_loss', patience=4)
         model.summary()
 
         model.fit(X_train,
@@ -86,7 +89,7 @@ class MlpModel (IModel):
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
 
-H = Aahaber(False, False)
+H = Tweet3K(False, True)
 tp = TurkishProcessor(H)
 mm = MlpModel(tp, H)
 mm.evaluate()

@@ -48,6 +48,10 @@ class Aahaber (IDataset):
     def getFeatures(self):
         return self.getDataset().iloc[:, 0].values
 
+    def getPath(self):
+        return Path(__file__).parent / \
+            "../Data/aahaber"
+
 # H = Hurriyet()
 # H.getDataset()
 # print(H.getDataset())

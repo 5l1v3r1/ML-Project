@@ -25,7 +25,7 @@ import pickle
 
 class OneLayerModel (IModel):
 
-    EPOCHS = 30
+    EPOCHS = 200
     BATCH_SIZE = 100
     ACTIVATION = 'softmax'
     LOSSFUNC = 'binary_crossentropy'
@@ -38,9 +38,12 @@ class OneLayerModel (IModel):
 
     def evaluate(self):
 
-        features = self.processor.process()
-        #pickle.dump(features, open("bow.p", "wb"))
-        #features = pickle.load(open("bow.p", "rb"))
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         labels = self.dataset.getClasses()
         le = preprocessing.LabelEncoder()
         labels = le.fit_transform(labels)
@@ -88,7 +91,7 @@ class OneLayerModel (IModel):
         print("Accuracy: %.2f%%" % (scores[1]*100))
 
 
-H = Hurriyet(False, True)
+H = Milliyet(False, True)
 tp = TurkishProcessor(H)
 mm = OneLayerModel(tp, H)
 mm.evaluate()

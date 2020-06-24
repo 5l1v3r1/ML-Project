@@ -3,6 +3,7 @@ import random
 import re
 from nltk import WordPunctTokenizer
 from snowballstemmer import TurkishStemmer
+import pickle
 
 
 def readLineByLine(data):

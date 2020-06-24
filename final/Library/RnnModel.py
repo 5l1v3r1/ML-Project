@@ -29,9 +29,9 @@ class RnnModel (IModel):
     LOSSFUNC = 'binary_crossentropy'
     TEST_SIZE = 0.2
     NUM_WORDS = 2500
-    EMBEDING_DIM = 100
-    EPOCHS = 50
-    BATCH_SIZE = 200
+    EMBEDING_DIM = 64
+    EPOCHS = 200
+    BATCH_SIZE = 400
     VOCAB_SIZE = 0
     INPUT_LENGTH = 0
 
@@ -41,9 +41,12 @@ class RnnModel (IModel):
 
     def evaluate(self):
 
-        features = self.processor.process()
-        #pickle.dump(features, open("bow.p", "wb"))
-        #features = pickle.load(open("bow.p", "rb"))
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         labels = self.getLables()
         x_train, x_test, y_train, y_test = self.prepareData(features, labels)
         self.rnn_model(x_train, x_test, y_train, y_test)
@@ -102,7 +105,7 @@ class RnnModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Aahaber(False, True)
+H = Milliyet(False, True)
 tp = TurkishProcessor(H)
 mm = RnnModel(tp, H)
 mm.evaluate()

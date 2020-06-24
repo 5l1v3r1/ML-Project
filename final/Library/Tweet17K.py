@@ -3,7 +3,6 @@ from pathlib import Path
 import os
 import io
 import pandas as pd
-
 from IDataset import IDataset
 
 
@@ -45,6 +44,10 @@ class Tweet17K (IDataset):
 
     def getFeatures(self):
         return self.getDataset().iloc[:, 0].values
+
+    def getPath(self):
+        return Path(__file__).parent / \
+            "../Data/tweet17k"
 
     def readLineByLine(self, data):
         tweets = []

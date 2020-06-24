@@ -28,10 +28,10 @@ class CnnModel (IModel):
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
     TEST_SIZE = 0.2
-    NUM_WORDS = 2500
+    NUM_WORDS = 1500
     EMBEDING_DIM = 100
-    EPOCHS = 50
-    BATCH_SIZE = 200
+    EPOCHS = 100
+    BATCH_SIZE = 600
     VOCAB_SIZE = 0
     INPUT_LENGTH = 0
 
@@ -41,9 +41,12 @@ class CnnModel (IModel):
 
     def evaluate(self):
 
-        features = self.processor.process()
-        #pickle.dump(features, open("bow.p", "wb"))
-        #features = pickle.load(open("bow.p", "rb"))
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         labels = self.getLables()
         x_train, x_test, y_train, y_test = self.prepareData(features, labels)
         self.cnn_model(x_train, x_test, y_train, y_test)
@@ -89,7 +92,7 @@ class CnnModel (IModel):
                       loss=self.LOSSFUNC,
                       metrics=['accuracy'])
         es_callback = EarlyStopping(
-            monitor='val_loss', patience=3)
+            monitor='val_loss', patience=4)
         model.summary()
 
         history = model.fit(x_train, y_train,
@@ -103,7 +106,7 @@ class CnnModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Aahaber(False, True)
+H = Milliyet(False, True)
 tp = TurkishProcessor(H)
 mm = CnnModel(tp, H)
 mm.evaluate()

@@ -30,8 +30,8 @@ class LstmModel (IModel):
     TEST_SIZE = 0.2
     NUM_WORDS = 2500
     EMBEDING_DIM = 100
-    EPOCHS = 50
-    BATCH_SIZE = 200
+    EPOCHS = 200
+    BATCH_SIZE = 400
     VOCAB_SIZE = 0
     INPUT_LENGTH = 0
 
@@ -41,9 +41,12 @@ class LstmModel (IModel):
 
     def evaluate(self):
 
-        features = self.processor.process()
-        #pickle.dump(features, open("bow.p", "wb"))
-        #features = pickle.load(open("bow.p", "rb"))
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         labels = self.getLables()
         x_train, x_test, y_train, y_test = self.prepareData(features, labels)
         self.lstm_model(x_train, x_test, y_train, y_test)
@@ -102,7 +105,7 @@ class LstmModel (IModel):
         print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
-H = Aahaber(False, False)
+H = Milliyet(False, False)
 tp = TurkishProcessor(H)
 mm = LstmModel(tp, H)
 mm.evaluate()

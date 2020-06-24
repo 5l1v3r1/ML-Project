@@ -13,7 +13,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Embedding, Dropout, LSTM, SpatialDropout1D
+from tensorflow.keras.layers import Dense, Flatten, Embedding, Dropout, LSTM, SpatialDropout1D, Conv1D, GlobalMaxPooling1D
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
@@ -33,7 +33,7 @@ class FastTextModel (IModel):
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
     TEST_SIZE = 0.2
-    NUM_WORDS = 2000
+    NUM_WORDS = 900
 
     def __init__(self, processor: IProcessor, dataset: IDataset):
         self.processor = processor
@@ -41,26 +41,29 @@ class FastTextModel (IModel):
 
     def evaluate(self):
 
-        # features = self.processor.process()
-        # pickle.dump(features, open("bow.p", "wb"))
-        features = pickle.load(open("bow.p", "rb"))
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         word_punctuation_tokenizer = WordPunctTokenizer()
         word_tokenized_corpus = [
             word_punctuation_tokenizer.tokenize(sent) for sent in features]
         # print(word_tokenized_corpus)
         embedding_size = 64
-        window_size = 40
+        window_size = 3
         min_word = 5
         down_sampling = 1e-2
-        # ft_model = FastText(word_tokenized_corpus,
-        #                     size=embedding_size,
-        #                     window=window_size,
-        #                     min_count=min_word,
-        #                     sample=down_sampling,
-        #                     sg=1,
-        #                     iter=100)
+        ft_model = FastText(word_tokenized_corpus,
+                            size=embedding_size,
+                            window=window_size,
+                            min_count=min_word,
+                            sample=down_sampling,
+                            sg=1,
+                            iter=100)
         # pickle.dump(ft_model, open("ft_model.p", "wb"))
-        ft_model = pickle.load(open("ft_model.p", "rb"))
+        # ft_model = pickle.load(open("ft_model.p", "rb"))
         # print(ft_model.wv['gün'])
         embedding_matrix = np.zeros((len(ft_model.wv.vocab) + 1, 64))
         for i, vec in enumerate(ft_model.wv.vectors):
@@ -100,12 +103,13 @@ class FastTextModel (IModel):
         le = preprocessing.LabelEncoder()
         labels = le.fit_transform(labels)
         labels = to_categorical(labels)
-        self.mlp_model(features, labels, embedding_matrix, vocab_size)
+        self.mlp_model(features, labels, embedding_matrix,
+                       vocab_size, ft_model)
 
     def setParameters(self):
         pass
 
-    def mlp_model(self, processed_features, labels, embedding_matrix, vocab_size):
+    def mlp_model(self, processed_features, labels, embedding_matrix, vocab_size, model):
         classes_num = self.dataset.getParameters()["classes_num"]
         X_train, X_test, y_train, y_test = train_test_split(
             processed_features, labels, test_size=self.TEST_SIZE, random_state=0)
@@ -120,25 +124,28 @@ class FastTextModel (IModel):
         model = Sequential()
         model.add(Embedding(vocab_size, 64, input_length=lenth,
                             weights=[embedding_matrix], trainable=True))
-        model.add(SpatialDropout1D(0.2))
-        model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
+        model.add(Dropout(0.5))
+        model.add(Conv1D(128, 5, activation='relu'))
+        model.add(GlobalMaxPooling1D())
+        model.add(Dense(64, activation='relu'))
+        model.add(Dropout(0.5))
         model.add(Dense(classes_num, activation=self.ACTIVATION))
-        model.compile(loss=self.LOSSFUNC, optimizer='adam',
+        model.compile(optimizer='adam',
+                      loss=self.LOSSFUNC,
                       metrics=['accuracy'])
         es_callback = EarlyStopping(
-            monitor='val_loss', patience=3)
+            monitor='val_loss', patience=4)
         model.summary()
 
-        model.fit(X_train,
-                  y_train,
-                  validation_data=(X_test, y_test),
-                  epochs=self.EPOCHS,
-                  batch_size=self.BATCH_SIZE,
-                  verbose=1)
-
-        predicted_sentiment = model.predict(X_test)
-        scores = model.evaluate(X_test, y_test, verbose=1)
-        print("Accuracy: %.2f%%" % (scores[1]*100))
+        history = model.fit(X_train, y_train,
+                            epochs=self.EPOCHS,
+                            verbose=1,
+                            validation_data=(X_test, y_test),
+                            batch_size=self.BATCH_SIZE, callbacks=[es_callback])
+        loss, accuracy = model.evaluate(X_train, y_train, verbose=1)
+        print("Training Accuracy: {:.4f}".format(accuracy))
+        loss, accuracy = model.evaluate(X_test, y_test, verbose=1)
+        print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 
 H = Aahaber(False, True)
