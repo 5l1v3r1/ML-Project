@@ -103,13 +103,13 @@ class FastTextModel (IModel):
         le = preprocessing.LabelEncoder()
         labels = le.fit_transform(labels)
         labels = to_categorical(labels)
-        self.mlp_model(features, labels, embedding_matrix,
-                       vocab_size, ft_model)
+        return self.ft_model(features, labels, embedding_matrix,
+                             vocab_size, ft_model)
 
     def setParameters(self):
         pass
 
-    def mlp_model(self, processed_features, labels, embedding_matrix, vocab_size, model):
+    def ft_model(self, processed_features, labels, embedding_matrix, vocab_size, model):
         classes_num = self.dataset.getParameters()["classes_num"]
         X_train, X_test, y_train, y_test = train_test_split(
             processed_features, labels, test_size=self.TEST_SIZE, random_state=0)
@@ -146,9 +146,10 @@ class FastTextModel (IModel):
         print("Training Accuracy: {:.4f}".format(accuracy))
         loss, accuracy = model.evaluate(X_test, y_test, verbose=1)
         print("Testing Accuracy:  {:.4f}".format(accuracy))
+        return history
 
 
-H = Tweet17K(False, True)
-tp = TurkishProcessor(H)
-mm = FastTextModel(tp, H)
-mm.evaluate()
+# H = Tweet17K(False, True)
+# tp = TurkishProcessor(H)
+# mm = FastTextModel(tp, H)
+# mm.evaluate()

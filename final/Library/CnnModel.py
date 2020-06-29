@@ -50,7 +50,7 @@ class CnnModel (IModel):
             pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         labels = self.getLables()
         x_train, x_test, y_train, y_test = self.prepareData(features, labels)
-        self.cnn_model(x_train, x_test, y_train, y_test)
+        return self.cnn_model(x_train, x_test, y_train, y_test)
 
     def setParameters(self):
         pass
@@ -105,6 +105,7 @@ class CnnModel (IModel):
         print("Training Accuracy: {:.4f}".format(accuracy))
         loss, accuracy = model.evaluate(x_test, y_test, verbose=1)
         print("Testing Accuracy:  {:.4f}".format(accuracy))
+        return history
 
 
 # H = Milliyet(False, True)
@@ -112,7 +113,7 @@ class CnnModel (IModel):
 # mm = CnnModel(tp, H)
 # mm.evaluate()
 
-H = MiniNews(False, True)
-tp = EnglishProcessor(H)
-mm = CnnModel(tp, H)
-mm.evaluate()
+# H = MiniNews(False, True)
+# tp = EnglishProcessor(H)
+# mm = CnnModel(tp, H)
+# mm.evaluate()

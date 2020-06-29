@@ -3,8 +3,7 @@ from pathlib import Path
 import os
 import io
 import pandas as pd
-
-from IDataset import IDataset
+from .IDataset import IDataset
 
 
 class Tweet17K (IDataset):
@@ -25,12 +24,12 @@ class Tweet17K (IDataset):
             random.shuffle(dataset)
             random.shuffle(dataset)
             dataset = pd.DataFrame(dataset, columns=['Sentence', 'Sentiment'])
-            dataset.dropna(inplace=True)
+            # dataset.dropna(inplace=True)
             path = Path(__file__).parent / \
                 "../Data/tweet17k/dataset.csv"
             dataset.to_csv(path, index=False)
             print("No csv file was found!, new file was created :)")
-        dataset = dataset.sample(frac=1).reset_index(drop=True)
+        # dataset = dataset.sample(frac=1).reset_index(drop=True)
         return dataset
 
     def getParameters(self):
@@ -40,11 +39,18 @@ class Tweet17K (IDataset):
         self.tweet = tweet
         self.stemming = stemming
 
+    def __str__(self):
+        return '17K Tweet'
+
     def getClasses(self):
         return self.getDataset().iloc[:, 1].values
 
     def getFeatures(self):
         return self.getDataset().iloc[:, 0].values
+
+    def getPath(self):
+        return Path(__file__).parent / \
+            "../Data/tweet17k"
 
     def readLineByLine(self, data):
         tweets = []

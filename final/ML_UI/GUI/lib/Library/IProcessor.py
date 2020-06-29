@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from . import IDataset
+from .IDataset import IDataset
 
 
 class IProcessor (ABC):

@@ -4,7 +4,7 @@ import os
 import io
 import pandas as pd
 
-from IDataset import IDataset
+from .IDataset import IDataset
 
 
 class Tweet3K (IDataset):
@@ -30,12 +30,12 @@ class Tweet3K (IDataset):
                             dataset.append(sub_data)
                 random.shuffle(dataset)
             dataset = pd.DataFrame(dataset, columns=['Sentence', 'Sentiment'])
-            dataset.dropna(inplace=True)
+            # dataset.dropna(inplace=True)
             path = Path(__file__).parent / \
                 "../Data/tweet3k/dataset.csv"
             dataset.to_csv(path, index=False, encoding='iso-8859-9')
             print("No csv file was found!, new file was created :)")
-        dataset = dataset.sample(frac=1).reset_index(drop=True)
+        #dataset = dataset.sample(frac=1).reset_index(drop=True)
         return dataset
 
     def getParameters(self):
@@ -45,12 +45,18 @@ class Tweet3K (IDataset):
         self.tweet = tweet
         self.stemming = stemming
 
+    def __str__(self):
+        return '3K Tweet'
+
     def getClasses(self):
         return self.getDataset().iloc[:, 1].values
 
     def getFeatures(self):
         return self.getDataset().iloc[:, 0].values
 
+    def getPath(self):
+        return Path(__file__).parent / \
+            "../Data/tweet3k"
 
 # H = Tweet3K()
 # H.getDataset()

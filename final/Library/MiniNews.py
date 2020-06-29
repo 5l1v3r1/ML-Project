@@ -69,6 +69,6 @@ class MiniNews (IDataset):
             "../Data/mini-news"
 
 
-H = MiniNews(False, True)
-H.getDataset()
-H.getDataset()
+# H = MiniNews(False, True)
+# H.getDataset()
+# H.getDataset()

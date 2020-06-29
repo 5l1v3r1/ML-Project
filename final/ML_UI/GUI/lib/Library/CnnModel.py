@@ -1,14 +1,17 @@
-from IModel import IModel
-from IProcessor import IProcessor
-from IDataset import IDataset
+from .IModel import IModel
+from .IProcessor import IProcessor
+from .IDataset import IDataset
 
-from Hurriyet import Hurriyet
-from Aahaber import Aahaber
-from Tweet3K import Tweet3K
-from Tweet17K import Tweet17K
-from Milliyet import Milliyet
-from TurkishProcessor import TurkishProcessor
-from helpers import get_external_stopwords, find_max_length
+# from MiniNews import MiniNews
+# from EnglishProcessor import EnglishProcessor
+# from Hurriyet import Hurriyet
+# from Aahaber import Aahaber
+# from Tweet3K import Tweet3K
+# from Tweet17K import Tweet17K
+# from Milliyet import Milliyet
+# from TurkishProcessor import TurkishProcessor
+
+from .helpers import get_external_stopwords, find_max_length
 import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -28,25 +31,33 @@ class CnnModel (IModel):
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
     TEST_SIZE = 0.2
-    NUM_WORDS = 2500
+    NUM_WORDS = 1500
     EMBEDING_DIM = 100
-    EPOCHS = 50
+    EPOCHS = 100
     BATCH_SIZE = 200
     VOCAB_SIZE = 0
     INPUT_LENGTH = 0
 
-    def __init__(self, processor: IProcessor, dataset: IDataset):
+    def __init__(self, processor: IProcessor, dataset: IDataset, test_size=None):
         self.processor = processor
         self.dataset = dataset
+        if test_size != None:
+            self.TEST_SIZE = test_size
+
+    def __str__(self):
+        return 'CNN'
 
     def evaluate(self):
 
-        features = self.processor.process()
-        #pickle.dump(features, open("bow.p", "wb"))
-        #features = pickle.load(open("bow.p", "rb"))
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         labels = self.getLables()
         x_train, x_test, y_train, y_test = self.prepareData(features, labels)
-        self.cnn_model(x_train, x_test, y_train, y_test)
+        return self.cnn_model(x_train, x_test, y_train, y_test)
 
     def setParameters(self):
         pass
@@ -89,7 +100,7 @@ class CnnModel (IModel):
                       loss=self.LOSSFUNC,
                       metrics=['accuracy'])
         es_callback = EarlyStopping(
-            monitor='val_loss', patience=3)
+            monitor='val_loss', patience=4)
         model.summary()
 
         history = model.fit(x_train, y_train,
@@ -101,9 +112,15 @@ class CnnModel (IModel):
         print("Training Accuracy: {:.4f}".format(accuracy))
         loss, accuracy = model.evaluate(x_test, y_test, verbose=1)
         print("Testing Accuracy:  {:.4f}".format(accuracy))
+        return history
 
 
-H = Aahaber(False, True)
-tp = TurkishProcessor(H)
-mm = CnnModel(tp, H)
-mm.evaluate()
+# H = Milliyet(False, True)
+# tp = TurkishProcessor(H)
+# mm = CnnModel(tp, H)
+# mm.evaluate()
+
+# H = MiniNews(False, True)
+# tp = EnglishProcessor(H)
+# mm = CnnModel(tp, H)
+# mm.evaluate()

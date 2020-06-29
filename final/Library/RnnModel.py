@@ -49,7 +49,7 @@ class RnnModel (IModel):
             pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
         labels = self.getLables()
         x_train, x_test, y_train, y_test = self.prepareData(features, labels)
-        self.rnn_model(x_train, x_test, y_train, y_test)
+        return self.rnn_model(x_train, x_test, y_train, y_test)
 
     def setParameters(self):
         pass
@@ -103,9 +103,11 @@ class RnnModel (IModel):
         print("Training Accuracy: {:.4f}".format(accuracy))
         loss, accuracy = model.evaluate(x_test, y_test, verbose=1)
         print("Testing Accuracy:  {:.4f}".format(accuracy))
+        return history
 
 
-H = Aahaber(False, True)
-tp = TurkishProcessor(H)
-mm = RnnModel(tp, H)
-mm.evaluate()
+# H = Tweet3K(False, True)
+# tp = TurkishProcessor(H)
+# mm = RnnModel(tp, H)
+# history = mm.evaluate()
+# print(history.history['val_loss'])

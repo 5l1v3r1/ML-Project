@@ -49,12 +49,12 @@ class OneLayerModel (IModel):
         le = preprocessing.LabelEncoder()
         labels = le.fit_transform(labels)
         labels = to_categorical(labels)
-        self.mlp_model(features, labels)
+        return self.ol_model(features, labels)
 
     def setParameters(self):
         pass
 
-    def mlp_model(self, processed_features, labels):
+    def ol_model(self, processed_features, labels):
         # print(processed_features)
         # print(labels)
         classes_num = self.dataset.getParameters()["classes_num"]
@@ -80,16 +80,17 @@ class OneLayerModel (IModel):
             monitor='val_loss', patience=3)
         model.summary()
 
-        model.fit(X_train,
-                  y_train,
-                  validation_data=(X_test, y_test),
-                  epochs=self.EPOCHS,
-                  batch_size=self.BATCH_SIZE,
-                  verbose=1, callbacks=[es_callback])
+        history = model.fit(X_train,
+                            y_train,
+                            validation_data=(X_test, y_test),
+                            epochs=self.EPOCHS,
+                            batch_size=self.BATCH_SIZE,
+                            verbose=1, callbacks=[es_callback])
 
         predicted_sentiment = model.predict(X_test)
         scores = model.evaluate(X_test, y_test, verbose=1)
         print("Accuracy: %.2f%%" % (scores[1]*100))
+        return history
 
 
 # H = Milliyet(False, True)
@@ -98,7 +99,7 @@ class OneLayerModel (IModel):
 # mm.evaluate()
 
 
-H = MiniNews(False, True)
-tp = EnglishProcessor(H)
-mm = OneLayerModel(tp, H)
-mm.evaluate()
+# H = MiniNews(False, True)
+# tp = EnglishProcessor(H)
+# mm = OneLayerModel(tp, H)
+# mm.evaluate()

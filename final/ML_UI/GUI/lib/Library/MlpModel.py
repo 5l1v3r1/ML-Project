@@ -2,12 +2,16 @@ from .IModel import IModel
 from .IProcessor import IProcessor
 from .IDataset import IDataset
 
-# from . import Hurriyet
-# from . import Aahaber
-# from . import Tweet3K
-# from . import Tweet17K
-# from . import Milliyet
-# from . import TurkishProcessor
+# from MiniNews import MiniNews
+# from EnglishProcessor import EnglishProcessor
+
+# from Hurriyet import Hurriyet
+# from Aahaber import Aahaber
+# from Tweet3K import Tweet3K
+# from Tweet17K import Tweet17K
+# from Milliyet import Milliyet
+# from TurkishProcessor import TurkishProcessor
+
 from .helpers import get_external_stopwords, find_max_length
 import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -25,27 +29,35 @@ import pickle
 
 class MlpModel (IModel):
 
-    EPOCHS = 30
+    EPOCHS = 200
     BATCH_SIZE = 100
     ACTIVATION = 'sigmoid'
     LOSSFUNC = 'binary_crossentropy'
-    TEST_SIZE = 0.2
+    TEST_SIZE = 0.7
     NUM_WORDS = 1500
 
-    def __init__(self, processor: IProcessor, dataset: IDataset):
+    def __init__(self, processor: IProcessor, dataset: IDataset, test_size=None):
         self.processor = processor
         self.dataset = dataset
+        if test_size != None:
+            self.TEST_SIZE = test_size
+
+    def __str__(self):
+        return 'MLP'
 
     def evaluate(self):
+        path = self.dataset.getPath()
+        try:
+            features = pickle.load(open(f"{path}/preprocessed.p", "rb"))
+        except:
+            features = self.processor.process()
+            pickle.dump(features, open(f"{path}/preprocessed.p", "wb"))
 
-        features = self.processor.process()
-        #pickle.dump(features, open("bow.p", "wb"))
-        #features = pickle.load(open("bow.p", "rb"))
         labels = self.dataset.getClasses()
         le = preprocessing.LabelEncoder()
         labels = le.fit_transform(labels)
         labels = to_categorical(labels)
-        self.mlp_model(features, labels)
+        return self.mlp_model(features, labels)
 
     def setParameters(self):
         pass
@@ -65,28 +77,35 @@ class MlpModel (IModel):
         model = Sequential()
         model.add(Embedding(vocab_size, 64, input_length=lenth))
         model.add(Flatten())
-        model.add(Dense(4, activation='relu'))
+        model.add(Dense(64, activation='relu'))
         model.add(Dropout(0.4))
         model.add(Dense(classes_num, activation=self.ACTIVATION))
         model.compile(loss=self.LOSSFUNC, optimizer='adam',
                       metrics=['accuracy'])
         es_callback = EarlyStopping(
-            monitor='val_loss', patience=3)
+            monitor='val_loss', patience=4)
         model.summary()
 
-        model.fit(X_train,
-                  y_train,
-                  validation_data=(X_test, y_test),
-                  epochs=self.EPOCHS,
-                  batch_size=self.BATCH_SIZE,
-                  verbose=1, callbacks=[es_callback])
+        histroy = model.fit(X_train,
+                            y_train,
+                            validation_data=(X_test, y_test),
+                            epochs=self.EPOCHS,
+                            batch_size=self.BATCH_SIZE,
+                            verbose=1, callbacks=[es_callback])
 
         predicted_sentiment = model.predict(X_test)
         scores = model.evaluate(X_test, y_test, verbose=1)
         print("Accuracy: %.2f%%" % (scores[1]*100))
+        return histroy
 
 
 # H = Milliyet(False, True)
 # tp = TurkishProcessor(H)
+# mm = MlpModel(tp, H)
+# mm.evaluate()
+
+
+# H = MiniNews(False, True)
+# tp = EnglishProcessor(H)
 # mm = MlpModel(tp, H)
 # mm.evaluate()

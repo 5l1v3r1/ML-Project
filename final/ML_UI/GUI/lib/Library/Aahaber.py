@@ -29,10 +29,10 @@ class Aahaber (IDataset):
             path = Path(__file__).parent / \
                 "../Data/aahaber/dataset.csv"
             dataset = pd.DataFrame(dataset, columns=['Sentence', 'Category'])
-            dataset.dropna(inplace=True)
+            # dataset.dropna(inplace=True)
             dataset.to_csv(path, index=False, encoding='iso-8859-9')
             print("No csv file was found!, new file was created :)")
-        dataset = dataset.sample(frac=1).reset_index(drop=True)
+        #dataset = dataset.sample(frac=1).reset_index(drop=True)
         return dataset
 
     def getParameters(self):
@@ -42,11 +42,18 @@ class Aahaber (IDataset):
         self.tweet = tweet
         self.stemming = stemming
 
+    def __str__(self):
+        return 'Aahaber'
+
     def getClasses(self):
-        return self.getDataset().iloc[:1000, 1].values
+        return self.getDataset().iloc[:, 1].values
 
     def getFeatures(self):
-        return self.getDataset().iloc[:1000, 0].values
+        return self.getDataset().iloc[:, 0].values
+
+    def getPath(self):
+        return Path(__file__).parent / \
+            "../Data/aahaber"
 
 # H = Hurriyet()
 # H.getDataset()

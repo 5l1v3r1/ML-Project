@@ -17,3 +17,7 @@ class IDataset (ABC):
     @abstractmethod
     def getClasses(self):
         pass
+
+    @abstractmethod
+    def getPath(self):
+        pass

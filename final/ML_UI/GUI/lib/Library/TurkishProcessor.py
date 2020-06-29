@@ -1,11 +1,14 @@
 from .IProcessor import IProcessor
 from .IDataset import IDataset
 # from Hurriyet import Hurriyet
+
+
 import pandas as pd
 import random
 import re
 from nltk import WordPunctTokenizer
 from snowballstemmer import TurkishStemmer
+from pathlib import Path
 
 
 class TurkishProcessor(IProcessor):
@@ -89,7 +92,9 @@ class TurkishProcessor(IProcessor):
         return sentence
 
     def get_external_stopwords(self):
-        file = open("stop_words.txt", "r", encoding='utf8')
+        path = Path(__file__).parent / \
+            "../Data/stop_words.txt"
+        file = open(path, "r", encoding='utf8')
         stop_words = [word.strip() for word in file]
         file.close()
 
